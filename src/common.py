@@ -169,6 +169,21 @@ async def updateLCD(text, display, stop_event=None, delay=0.02):
     async with display_lock:
         if stop_event is None:
             stop_event = asyncio.Event()
+            
+        # Function to update endpoint with text data
+        async def send_text_to_backend(text):
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.post("http://localhost:8000/update-text", json={"text": text}) as response:
+                        if response.status == 200:
+                            print("Text sent to backend successfully")
+                        else:
+                            print(f"Failed to send text to backend, status: {response.status}")
+            except Exception as e:
+                print(f"Error sending text to backend: {e}")
+                    
+        # Start sending text to backend
+        await send_text_to_backend(text)
 
         async def display_text(delay):
             i = 0
