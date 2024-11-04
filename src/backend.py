@@ -33,6 +33,25 @@ app = FastAPI()
 
 app.mount("/static", StaticFiles(directory=SOURCE_DIR / "frontend" / "build" / "static"), name="static")
 
+display_text = ""
+
+class TextUpdate(BaseModel):
+    text: str
+    
+# Endpoint to update text / response
+@app.post("/update-text")
+async def update_text_endpoint(update: TextUpdate):
+    # Process the text or pass it to another function
+    global display_text
+    display_text = update.text
+    print("Recieved text:", update.text)
+    return {"status": "Text updated"}
+    
+@app.get("/update-text")
+async def get_display_text():
+    return JSONResponse(content={"text": display_text})
+
+
 @app.get("/favicon.ico")
 def read_favicon():
     return FileResponse(SOURCE_DIR / "frontend" / "build" / "favicon.ico")
